@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatSphere — Real-Time Messenger</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-bg">
+      <div class="orb orb1"></div>
+      <div class="orb orb2"></div>
+      <div class="orb orb3"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">💬</div>
+        <h1>ChatSphere</h1>
+        <p>Real-time peer-to-peer messaging</p>
+      </div>
+      <div class="login-form">
+        <div class="field-group">
+          <label>Choose your avatar</label>
+          <div class="avatar-picker" id="avatarPicker">
+            <span class="av-opt selected" data-emoji="😀">😀</span>
+            <span class="av-opt" data-emoji="😎">😎</span>
+            <span class="av-opt" data-emoji="🦊">🦊</span>
+            <span class="av-opt" data-emoji="🐼">🐼</span>
+            <span class="av-opt" data-emoji="🦁">🦁</span>
+            <span class="av-opt" data-emoji="🐸">🐸</span>
+            <span class="av-opt" data-emoji="🤖">🤖</span>
+            <span class="av-opt" data-emoji="👾">👾</span>
+            <span class="av-opt" data-emoji="🦋">🦋</span>
+            <span class="av-opt" data-emoji="🌙">🌙</span>
+            <span class="av-opt" data-emoji="⚡">⚡</span>
+            <span class="av-opt" data-emoji="🔥">🔥</span>
+            <span class="av-opt" data-emoji="🎭">🎭</span>
+            <span class="av-opt" data-emoji="🦄">🦄</span>
+            <span class="av-opt" data-emoji="🐉">🐉</span>
+            <span class="av-opt" data-emoji="🌺">🌺</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Pick your color</label>
+          <div class="color-picker" id="colorPicker">
+            <span class="cl-opt selected" data-color="#6C63FF" style="background:#6C63FF;"></span>
+            <span class="cl-opt" data-color="#FF6584" style="background:#FF6584;"></span>
+            <span class="cl-opt" data-color="#43D9A2" style="background:#43D9A2;"></span>
+            <span class="cl-opt" data-color="#F9A826" style="background:#F9A826;"></span>
+            <span class="cl-opt" data-color="#00C9FF" style="background:#00C9FF;"></span>
+            <span class="cl-opt" data-color="#FF8C42" style="background:#FF8C42;"></span>
+            <span class="cl-opt" data-color="#C77DFF" style="background:#C77DFF;"></span>
+            <span class="cl-opt" data-color="#4CC9F0" style="background:#4CC9F0;"></span>
+            <span class="cl-opt" data-color="#F72585" style="background:#F72585;"></span>
+            <span class="cl-opt" data-color="#7BF1A8" style="background:#7BF1A8;"></span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="usernameInput">Your display name</label>
+          <input type="text" id="usernameInput" placeholder="e.g. Alex Morgan" maxlength="30" autocomplete="off" />
+          <span class="field-hint">2–30 characters · visible to everyone</span>
+        </div>
+        <div id="loginError" class="login-error"></div>
+        <button id="loginBtn" class="btn-primary">Enter ChatSphere →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="appScreen" class="screen">
+    <div class="app-layout">
+
+      <!-- Left sidebar: rooms + DMs -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="my-profile" id="myProfile">
+            <div class="avatar-bubble" id="myAvatar">😀</div>
+            <div class="profile-info">
+              <span id="myName">User</span>
+              <span class="status-dot online"></span>
+            </div>
+          </div>
+          <div class="header-actions">
+            <button class="icon-btn" id="editProfileBtn" title="Edit Profile">✏️</button>
+            <button class="icon-btn" id="logoutBtn" title="Logout">⏻</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="sidebar-tabs">
+          <button class="tab-btn active" data-tab="rooms">Rooms</button>
+          <button class="tab-btn" data-tab="dms">People</button>
+        </div>
+
+        <!-- Rooms tab -->
+        <div class="tab-content active" id="tab-rooms">
+          <div class="section-header">
+            <span class="section-label">CHANNELS</span>
+            <button class="icon-btn small" id="createRoomBtn" title="Create room">+</button>
+          </div>
+          <div class="room-list" id="roomList"></div>
+        </div>
+
+        <!-- DMs tab -->
+        <div class="tab-content" id="tab-dms">
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search people…" autocomplete="off" />
+            <button class="clear-search hidden" id="clearSearch">✕</button>
+          </div>
+          <div class="section-label">ONLINE NOW</div>
+          <div class="user-list" id="userList"></div>
+          <div class="search-results hidden" id="searchResults">
+            <div class="section-label">RESULTS</div>
+            <div id="searchList"></div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Chat panel -->
+      <main class="chat-panel">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">💬</div>
+          <h2>Pick a conversation</h2>
+          <p>Join a room or message someone directly.</p>
+        </div>
+
+        <div class="chat-window hidden" id="chatWindow">
+          <div class="chat-header">
+            <div class="chat-peer-info">
+              <div class="peer-avatar" id="peerAvatar">😀</div>
+              <div>
+                <div class="peer-name" id="peerName">—</div>
+                <div class="peer-status" id="peerStatus">online</div>
+              </div>
+            </div>
+            <button class="icon-btn close-chat" id="closeChatBtn">✕</button>
+          </div>
+
+          <div class="messages-area" id="messagesArea">
+            <div class="messages-inner" id="messagesInner"></div>
+          </div>
+
+          <div class="typing-bar hidden" id="typingBar">
+            <span id="typingName">Someone</span> is typing
+            <span class="typing-dots"><span></span><span></span><span></span></span>
+          </div>
+
+          <div class="input-bar">
+            <button class="tool-btn emoji-toggle" id="emojiToggle" title="Emoji">😊</button>
+            <label class="tool-btn" title="Share image" for="imgUpload">🖼</label>
+            <input type="file" id="imgUpload" accept="image/*" class="hidden-file" />
+            <label class="tool-btn" title="Share video" for="vidUpload">🎥</label>
+            <input type="file" id="vidUpload" accept="video/*" class="hidden-file" />
+            <textarea id="messageInput" placeholder="Type a message…" rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">➤</button>
+          </div>
+
+          <div class="emoji-picker hidden" id="emojiPicker"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Context menu for messages -->
+  <div class="ctx-menu hidden" id="ctxMenu">
+    <div class="ctx-item" id="ctx-react">React 😊</div>
+    <div class="ctx-item" id="ctx-delete">Delete 🗑</div>
+    <div class="ctx-item" id="ctx-copy">Copy 📋</div>
+  </div>
+
+  <!-- Emoji reaction picker (mini) -->
+  <div class="reaction-picker hidden" id="reactionPicker">
+    <span data-emoji="👍">👍</span>
+    <span data-emoji="❤️">❤️</span>
+    <span data-emoji="😂">😂</span>
+    <span data-emoji="😮">😮</span>
+    <span data-emoji="😢">😢</span>
+    <span data-emoji="🔥">🔥</span>
+    <span data-emoji="🎉">🎉</span>
+    <span data-emoji="👀">👀</span>
+  </div>
+
+  <!-- Create room modal -->
+  <div class="modal-overlay hidden" id="createRoomModal">
+    <div class="modal">
+      <h3>Create a Room</h3>
+      <input type="text" id="roomNameInput" placeholder="e.g. design-team" maxlength="40" />
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelRoomBtn">Cancel</button>
+        <button class="btn-primary" id="confirmRoomBtn">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit profile modal -->
+  <div class="modal-overlay hidden" id="editProfileModal">
+    <div class="modal">
+      <h3>Edit Profile</h3>
+      <label>Avatar</label>
+      <div class="avatar-picker" id="editAvatarPicker">
+        <span class="av-opt" data-emoji="😀">😀</span>
+        <span class="av-opt" data-emoji="😎">😎</span>
+        <span class="av-opt" data-emoji="🦊">🦊</span>
+        <span class="av-opt" data-emoji="🐼">🐼</span>
+        <span class="av-opt" data-emoji="🦁">🦁</span>
+        <span class="av-opt" data-emoji="🐸">🐸</span>
+        <span class="av-opt" data-emoji="🤖">🤖</span>
+        <span class="av-opt" data-emoji="👾">👾</span>
+        <span class="av-opt" data-emoji="🦋">🦋</span>
+        <span class="av-opt" data-emoji="🌙">🌙</span>
+        <span class="av-opt" data-emoji="⚡">⚡</span>
+        <span class="av-opt" data-emoji="🔥">🔥</span>
+        <span class="av-opt" data-emoji="🎭">🎭</span>
+        <span class="av-opt" data-emoji="🦄">🦄</span>
+        <span class="av-opt" data-emoji="🐉">🐉</span>
+        <span class="av-opt" data-emoji="🌺">🌺</span>
+      </div>
+      <label>Color</label>
+      <div class="color-picker" id="editColorPicker">
+        <span class="cl-opt" data-color="#6C63FF" style="background:#6C63FF;"></span>
+        <span class="cl-opt" data-color="#FF6584" style="background:#FF6584;"></span>
+        <span class="cl-opt" data-color="#43D9A2" style="background:#43D9A2;"></span>
+        <span class="cl-opt" data-color="#F9A826" style="background:#F9A826;"></span>
+        <span class="cl-opt" data-color="#00C9FF" style="background:#00C9FF;"></span>
+        <span class="cl-opt" data-color="#FF8C42" style="background:#FF8C42;"></span>
+        <span class="cl-opt" data-color="#C77DFF" style="background:#C77DFF;"></span>
+        <span class="cl-opt" data-color="#4CC9F0" style="background:#4CC9F0;"></span>
+        <span class="cl-opt" data-color="#F72585" style="background:#F72585;"></span>
+        <span class="cl-opt" data-color="#7BF1A8" style="background:#7BF1A8;"></span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" id="cancelProfileBtn">Cancel</button>
+        <button class="btn-primary" id="saveProfileBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media lightbox -->
+  <div class="lightbox hidden" id="lightbox">
+    <div class="lightbox-overlay" id="lightboxOverlay"></div>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <button class="lightbox-close" id="lightboxClose">✕</button>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
