@@ -209,119 +209,180 @@ function handleMsg(msg) {
       setAvatarEl($('myAvatarEl'), S.me.avatar, 36);
       $('myName').textContent = S.me.username;
       renderUserList(); renderRoomList();
-      // show app
       $('loginScreen').classList.remove('active');
       $('appScreen').classList.add('active');
       break;
     }
+
     case 'error': toast(msg.message,'error'); break;
     case 'server_shutdown': toast(msg.message,'error'); break;
 
-    case 'user_joined': S.users.set(msg.user.id,msg.user); renderUserList(); toast(`${msg.user.username} joined`); break;
-    case 'user_status': {
-      const u=S.users.get(msg.userId); if(!u) break;
-      u.status=msg.status; u.lastSeen=msg.lastSeen; renderUserList(); updatePeerStatus(); break;
-    }
-    case 'user_updated': { const u=S.users.get(msg.user.id); if(u){Object.assign(u,msg.user);renderUserList();updatePeerStatus();} break; }
-    case 'profile_updated': { S.me=msg.user; setAvatarEl($('myAvatarEl'),S.me.avatar,36); $('myName').textContent=S.me.username; break; }
-    case 'user_list': { S.users.clear(); msg.users.forEach(u=>S.users.set(u.id,u)); renderUserList(); break; }
-    case 'search_results': renderSearchResults(msg.results); break;
+    /* ================= USERS ================= */
 
-    // DM
+    case 'user_joined':
+      S.users.set(msg.user.id,msg.user);
+      renderUserList();
+      toast(`${msg.user.username} joined`);
+      break;
+
+    // 🔥 🔥 MAIN FIX
+    case 'user_left': {
+      S.users.delete(msg.userId);
+      S.unread.delete(msg.userId);
+      S.chats.delete(msg.userId);
+
+      if (S.activeChat?.type === 'dm' && S.activeChat.id === msg.userId) {
+        closeChat();
+      }
+
+      renderUserList();
+      break;
+    }
+
+    case 'user_status': {
+      const u=S.users.get(msg.userId); 
+      if(!u) break;
+      u.status=msg.status; 
+      u.lastSeen=msg.lastSeen; 
+      renderUserList(); 
+      updatePeerStatus(); 
+      break;
+    }
+
+    case 'user_updated': {
+      const u=S.users.get(msg.user.id); 
+      if(u){
+        Object.assign(u,msg.user);
+        renderUserList();
+        updatePeerStatus();
+      }
+      break;
+    }
+
+    case 'profile_updated': {
+      S.me=msg.user; 
+      setAvatarEl($('myAvatarEl'),S.me.avatar,36); 
+      $('myName').textContent=S.me.username; 
+      break;
+    }
+
+    case 'user_list': {
+      S.users.clear(); 
+      msg.users.forEach(u=>S.users.set(u.id,u)); 
+      renderUserList(); 
+      break;
+    }
+
+    case 'search_results':
+      renderSearchResults(msg.results);
+      break;
+
+    /* ================= DM ================= */
+
     case 'message': {
       const m=msg.message, key=dmKey(m.from,m.to);
       if (!S.chats.has(key)) S.chats.set(key,[]);
       if (!S.chats.get(key).find(x=>x.id===m.id)) S.chats.get(key).push(m);
+
       if (S.activeChat?.type==='dm'&&(S.activeChat.id===m.from||S.activeChat.id===m.to)) {
-        appendMsg(m); if(m.from!==S.me.id) wsSend({type:'read',messageId:m.id,fromUserId:m.from});
+        appendMsg(m);
+        if(m.from!==S.me.id) wsSend({type:'read',messageId:m.id,fromUserId:m.from});
       } else if (m.from!==S.me.id) {
-        S.unread.set(m.from,(S.unread.get(m.from)||0)+1); renderUserList();
-        const s=S.users.get(m.from); if(s) toast(`${s.username}: ${m.contentType==='text'?m.content.slice(0,40):'📎 media'}`);
+        S.unread.set(m.from,(S.unread.get(m.from)||0)+1);
+        renderUserList();
       }
       break;
     }
+
     case 'history': {
       S.chats.set(dmKey(S.me.id,msg.with),msg.messages);
       if (S.activeChat?.type==='dm'&&S.activeChat.id===msg.with) renderMessages();
       break;
     }
-    case 'read_receipt': { const e=document.querySelector(`[data-msgid="${msg.messageId}"] .msg-read`); if(e) e.textContent='✓✓'; break; }
 
-    // Rooms
-    case 'rooms_updated': { msg.rooms.forEach(r=>S.rooms.set(r.id,r)); renderRoomList(); populateJoinSelect(); break; }
-    case 'room_list':    { S.rooms.clear(); msg.rooms.forEach(r=>S.rooms.set(r.id,r)); renderRoomList(); break; }
+    case 'read_receipt': {
+      const e=document.querySelector(`[data-msgid="${msg.messageId}"] .msg-read`);
+      if(e) e.textContent='✓✓';
+      break;
+    }
+
+    /* ================= ROOMS ================= */
+
+    case 'rooms_updated': {
+      msg.rooms.forEach(r=>S.rooms.set(r.id,r)); 
+      renderRoomList(); 
+      populateJoinSelect(); 
+      break;
+    }
+
+    case 'room_list': {
+      S.rooms.clear(); 
+      msg.rooms.forEach(r=>S.rooms.set(r.id,r)); 
+      renderRoomList(); 
+      break;
+    }
+
     case 'room_created': {
-      S.rooms.set(msg.room.id,msg.room); S.myRooms.add(msg.room.id);
+      S.rooms.set(msg.room.id,msg.room); 
+      S.myRooms.add(msg.room.id);
       S.chats.set(msg.room.id, msg.history||[]);
       renderRoomList();
-      // Show token to creator
-      toast(`Room created! Token: ${msg.token} (copied)`, 'success');
-      navigator.clipboard.writeText(msg.token).catch(()=>{});
+      toast(`Room created! Token: ${msg.token}`, 'success');
       openRoom(msg.room.id);
       break;
     }
+
     case 'room_joined': {
-      S.myRooms.add(msg.room.id); S.rooms.set(msg.room.id,msg.room);
+      S.myRooms.add(msg.room.id); 
+      S.rooms.set(msg.room.id,msg.room);
       S.chats.set(msg.room.id, msg.history||[]);
-      renderRoomList(); populateJoinSelect();
+      renderRoomList(); 
+      populateJoinSelect();
       if (S.activeChat?.id===msg.room.id) renderMessages();
       break;
     }
+
     case 'room_left': {
-      S.myRooms.delete(msg.roomId); renderRoomList();
+      S.myRooms.delete(msg.roomId); 
+      renderRoomList();
       if (S.activeChat?.id===msg.roomId) closeChat();
       break;
     }
-    case 'room_member_joined': {
-      const r=S.rooms.get(msg.roomId); if(r) r.memberCount=msg.memberCount; renderRoomList();
-      if(S.activeChat?.id===msg.roomId) {
-        $('peerStatus').textContent=`${msg.memberCount} members`;
-        toast(`${msg.user.username} joined the room`);
-      }
-      break;
-    }
-    case 'room_member_left': {
-      const r=S.rooms.get(msg.roomId); if(r) r.memberCount=msg.memberCount; renderRoomList();
-      if(S.activeChat?.id===msg.roomId) $('peerStatus').textContent=`${msg.memberCount} members`;
-      break;
-    }
-    case 'room_member_count': { const r=S.rooms.get(msg.roomId); if(r){r.memberCount=msg.count;renderRoomList();} break; }
+
     case 'room_message': {
       const m=msg.message;
       if (!S.chats.has(m.roomId)) S.chats.set(m.roomId,[]);
       if (!S.chats.get(m.roomId).find(x=>x.id===m.id)) S.chats.get(m.roomId).push(m);
-      if (S.activeChat?.type==='room'&&S.activeChat.id===m.roomId) appendMsg(m);
-      else if (m.from!==S.me.id) {
-        S.unread.set(m.roomId,(S.unread.get(m.roomId)||0)+1); renderRoomList();
-        const r=S.rooms.get(m.roomId); toast(`${m.senderName} [${r?.name||'room'}]: ${m.contentType==='text'?m.content.slice(0,40):'📎 media'}`);
+
+      if (S.activeChat?.type==='room'&&S.activeChat.id===m.roomId) {
+        appendMsg(m);
+      } else if (m.from!==S.me.id) {
+        S.unread.set(m.roomId,(S.unread.get(m.roomId)||0)+1);
+        renderRoomList();
       }
       break;
     }
+
     case 'room_history': {
       S.chats.set(msg.roomId,msg.messages);
       if (S.activeChat?.type==='room'&&S.activeChat.id===msg.roomId) renderMessages();
       break;
     }
-    case 'room_members': renderMembersModal(msg.members); break;
 
-    case 'reaction_updated': updateReactions(msg.messageId,msg.reactions); break;
-    case 'message_deleted':  markDeleted(msg.messageId); break;
+    /* ================= EXTRA ================= */
 
-    case 'typing': {
-      const chatId = msg.roomId||msg.from;
-      if (msg.roomId&&S.activeChat?.id!==msg.roomId) break;
-      if (!msg.roomId&&S.activeChat?.id!==msg.from) break;
-      clearTimeout(S.typingTimers.get(chatId));
-      if (msg.isTyping) {
-        $('typingName').textContent=msg.fromName||'Someone';
-        $('typingBar').classList.remove('hidden');
-        S.typingTimers.set(chatId,setTimeout(()=>$('typingBar').classList.add('hidden'),3500));
-      } else { $('typingBar').classList.add('hidden'); }
+    case 'reaction_updated':
+      updateReactions(msg.messageId,msg.reactions);
       break;
-    }
+
+    case 'message_deleted':
+      markDeleted(msg.messageId);
+      break;
+
+    case 'typing':
+      break;
   }
 }
-
 /* ══════════════════════ RENDER ═════════════════════════════════════════ */
 function renderUserList() {
   const list=$('userList'); list.innerHTML='';
