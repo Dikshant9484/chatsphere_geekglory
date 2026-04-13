@@ -1,257 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatSphere — Real-Time Messenger</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ChatSphere</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div id="loginScreen" class="screen active">
-    <div class="login-bg">
-      <div class="orb orb1"></div>
-      <div class="orb orb2"></div>
-      <div class="orb orb3"></div>
+<!-- ══ LOGIN SCREEN ═══════════════════════════════════════════════════════ -->
+<div id="loginScreen" class="screen active">
+  <div class="login-bg">
+    <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">💬</div>
+      <h1>ChatSphere</h1>
+      <p>Real-time messaging reimagined</p>
     </div>
-    <div class="login-card">
-      <div class="login-logo">
-        <div class="logo-icon">💬</div>
-        <h1>ChatSphere</h1>
-        <p>Real-time peer-to-peer messaging</p>
+
+    <!-- Step 1: Avatar builder -->
+    <div id="loginStep1">
+      <h2 class="step-title">Build your avatar</h2>
+
+      <div class="av-preview" id="avPreview"></div>
+
+      <div class="av-section">
+        <div class="av-label">Gender</div>
+        <div class="av-pills">
+          <button class="av-pill active" data-key="gender" data-val="boy">👦 Boy</button>
+          <button class="av-pill" data-key="gender" data-val="girl">👧 Girl</button>
+        </div>
       </div>
-      <div class="login-form">
-        <div class="field-group">
-          <label>Choose your avatar</label>
-          <div class="avatar-picker" id="avatarPicker">
-            <span class="av-opt selected" data-emoji="😀">😀</span>
-            <span class="av-opt" data-emoji="😎">😎</span>
-            <span class="av-opt" data-emoji="🦊">🦊</span>
-            <span class="av-opt" data-emoji="🐼">🐼</span>
-            <span class="av-opt" data-emoji="🦁">🦁</span>
-            <span class="av-opt" data-emoji="🐸">🐸</span>
-            <span class="av-opt" data-emoji="🤖">🤖</span>
-            <span class="av-opt" data-emoji="👾">👾</span>
-            <span class="av-opt" data-emoji="🦋">🦋</span>
-            <span class="av-opt" data-emoji="🌙">🌙</span>
-            <span class="av-opt" data-emoji="⚡">⚡</span>
-            <span class="av-opt" data-emoji="🔥">🔥</span>
-            <span class="av-opt" data-emoji="🎭">🎭</span>
-            <span class="av-opt" data-emoji="🦄">🦄</span>
-            <span class="av-opt" data-emoji="🐉">🐉</span>
-            <span class="av-opt" data-emoji="🌺">🌺</span>
-          </div>
+
+      <div class="av-section">
+        <div class="av-label">Skin Tone</div>
+        <div class="av-swatches" id="skinSwatches">
+          <button class="av-sw active" data-key="skin" data-val="light" style="background:#FFDBAC" title="Light"></button>
+          <button class="av-sw" data-key="skin" data-val="medium_light" style="background:#F1C27D" title="Medium Light"></button>
+          <button class="av-sw" data-key="skin" data-val="medium" style="background:#C68642" title="Medium"></button>
+          <button class="av-sw" data-key="skin" data-val="medium_dark" style="background:#8D5524" title="Medium Dark"></button>
+          <button class="av-sw" data-key="skin" data-val="dark" style="background:#4A2912" title="Dark"></button>
         </div>
-        <div class="field-group">
-          <label>Pick your color</label>
-          <div class="color-picker" id="colorPicker">
-            <span class="cl-opt selected" data-color="#6C63FF" style="background:#6C63FF;"></span>
-            <span class="cl-opt" data-color="#FF6584" style="background:#FF6584;"></span>
-            <span class="cl-opt" data-color="#43D9A2" style="background:#43D9A2;"></span>
-            <span class="cl-opt" data-color="#F9A826" style="background:#F9A826;"></span>
-            <span class="cl-opt" data-color="#00C9FF" style="background:#00C9FF;"></span>
-            <span class="cl-opt" data-color="#FF8C42" style="background:#FF8C42;"></span>
-            <span class="cl-opt" data-color="#C77DFF" style="background:#C77DFF;"></span>
-            <span class="cl-opt" data-color="#4CC9F0" style="background:#4CC9F0;"></span>
-            <span class="cl-opt" data-color="#F72585" style="background:#F72585;"></span>
-            <span class="cl-opt" data-color="#7BF1A8" style="background:#7BF1A8;"></span>
-          </div>
-        </div>
-        <div class="field-group">
-          <label for="usernameInput">Your display name</label>
-          <input type="text" id="usernameInput" placeholder="e.g. Alex Morgan" maxlength="30" autocomplete="off" />
-          <span class="field-hint">2–30 characters · visible to everyone</span>
-        </div>
-        <div id="loginError" class="login-error"></div>
-        <button id="loginBtn" class="btn-primary">Enter ChatSphere →</button>
       </div>
+
+      <div class="av-section">
+        <div class="av-label">Hair Color</div>
+        <div class="av-swatches" id="hairSwatches">
+          <button class="av-sw active" data-key="hair" data-val="black" style="background:#1a1a1a" title="Black"></button>
+          <button class="av-sw" data-key="hair" data-val="brown" style="background:#6B3A2A" title="Brown"></button>
+          <button class="av-sw" data-key="hair" data-val="blonde" style="background:#D4A017" title="Blonde"></button>
+          <button class="av-sw" data-key="hair" data-val="red" style="background:#C0392B" title="Red"></button>
+          <button class="av-sw" data-key="hair" data-val="gray" style="background:#95a5a6" title="Gray"></button>
+          <button class="av-sw" data-key="hair" data-val="pink" style="background:#FF69B4" title="Pink"></button>
+          <button class="av-sw" data-key="hair" data-val="blue" style="background:#4169E1" title="Blue"></button>
+        </div>
+      </div>
+
+      <div class="av-section">
+        <div class="av-label">Outfit Color</div>
+        <div class="av-swatches" id="outfitSwatches">
+          <button class="av-sw active" data-key="outfit" data-val="#667eea" style="background:#667eea"></button>
+          <button class="av-sw" data-key="outfit" data-val="#f472b6" style="background:#f472b6"></button>
+          <button class="av-sw" data-key="outfit" data-val="#22d3a5" style="background:#22d3a5"></button>
+          <button class="av-sw" data-key="outfit" data-val="#fbbf24" style="background:#fbbf24"></button>
+          <button class="av-sw" data-key="outfit" data-val="#f87171" style="background:#f87171"></button>
+          <button class="av-sw" data-key="outfit" data-val="#38bdf8" style="background:#38bdf8"></button>
+          <button class="av-sw" data-key="outfit" data-val="#a78bfa" style="background:#a78bfa"></button>
+          <button class="av-sw" data-key="outfit" data-val="#34d399" style="background:#34d399"></button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="loginStep(2)">Continue →</button>
+    </div>
+
+    <!-- Step 2: Name -->
+    <div id="loginStep2" class="hidden">
+      <button class="back-btn" onclick="loginStep(1)">← Back</button>
+      <h2 class="step-title">Choose your name</h2>
+      <div class="av-preview" id="avPreview2"></div>
+      <input type="text" id="usernameInput" class="field-input" placeholder="Display name (2–30 chars)" maxlength="30" autocomplete="off"/>
+      <span class="field-hint">Letters, numbers, spaces allowed</span>
+      <div id="loginError" class="login-error"></div>
+      <button id="loginBtn" class="btn-primary">Enter ChatSphere 🚀</button>
     </div>
   </div>
+</div>
 
-  <!-- MAIN APP -->
-  <div id="appScreen" class="screen">
-    <div class="app-layout">
+<!-- ══ MAIN APP ════════════════════════════════════════════════════════════ -->
+<div id="appScreen" class="screen">
 
-      <!-- Left sidebar: rooms + DMs -->
-      <aside class="sidebar">
-        <div class="sidebar-header">
-          <div class="my-profile" id="myProfile">
-            <div class="avatar-bubble" id="myAvatar">😀</div>
-            <div class="profile-info">
-              <span id="myName">User</span>
-              <span class="status-dot online"></span>
+  <!-- Mobile header -->
+  <div class="mobile-header" id="mobileHeader">
+    <button class="icon-btn" id="menuToggleBtn" onclick="toggleSidebar()">☰</button>
+    <span class="mobile-title">💬 ChatSphere</span>
+    <div style="width:34px"></div>
+  </div>
+
+  <div class="app-layout">
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay hidden" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <!-- ── SIDEBAR ──────────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="my-profile" id="myProfile">
+          <div id="myAvatarEl" class="my-avatar-wrap"></div>
+          <div class="profile-info">
+            <span id="myName">User</span>
+            <span class="online-dot">● Online</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="editProfileBtn" title="Edit profile">✏️</button>
+          <button class="icon-btn" id="logoutBtn" title="Log out">⏻</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="sidebar-tabs">
+        <button class="tab-btn active" data-tab="rooms">🏠 Rooms</button>
+        <button class="tab-btn" data-tab="dms">👥 People</button>
+      </div>
+
+      <!-- Rooms tab -->
+      <div class="tab-content active" id="tab-rooms">
+        <div class="section-header">
+          <span class="section-label">MY ROOMS</span>
+          <div style="display:flex;gap:6px;">
+            <button class="small-btn" id="joinRoomBtn">🔑 Join</button>
+            <button class="small-btn" id="createRoomBtn">+ New</button>
+          </div>
+        </div>
+        <div class="room-list" id="roomList"></div>
+
+        <div id="discoverSection" class="hidden">
+          <div class="section-label" style="margin-top:12px">DISCOVER</div>
+          <div class="room-list" id="discoverList"></div>
+        </div>
+      </div>
+
+      <!-- DMs tab -->
+      <div class="tab-content hidden" id="tab-dms">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search people…" autocomplete="off"/>
+          <button class="clear-search hidden" id="clearSearch">✕</button>
+        </div>
+        <div class="section-label" id="peopleSectionLabel">ONLINE NOW</div>
+        <div class="user-list" id="userList"></div>
+        <div class="search-results hidden" id="searchResults">
+          <div class="section-label">RESULTS</div>
+          <div id="searchList"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── CHAT PANEL ────────────────────────────────────────────────── -->
+    <main class="chat-panel">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">💬</div>
+        <h2>Pick a conversation</h2>
+        <p>Join a room or message someone directly.</p>
+      </div>
+
+      <div class="chat-window hidden" id="chatWindow">
+        <div class="chat-header">
+          <button class="icon-btn mobile-back-btn" onclick="closeChat()">←</button>
+          <div class="chat-peer-info">
+            <div class="peer-avatar-wrap" id="peerAvatarWrap"></div>
+            <div>
+              <div class="peer-name" id="peerName">—</div>
+              <div class="peer-status" id="peerStatus">online</div>
             </div>
           </div>
-          <div class="header-actions">
-            <button class="icon-btn" id="editProfileBtn" title="Edit Profile">✏️</button>
-            <button class="icon-btn" id="logoutBtn" title="Logout">⏻</button>
-          </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="sidebar-tabs">
-          <button class="tab-btn active" data-tab="rooms">Rooms</button>
-          <button class="tab-btn" data-tab="dms">People</button>
-        </div>
-
-        <!-- Rooms tab -->
-        <div class="tab-content active" id="tab-rooms">
-          <div class="section-header">
-            <span class="section-label">CHANNELS</span>
-            <button class="icon-btn small" id="createRoomBtn" title="Create room">+</button>
-          </div>
-          <div class="room-list" id="roomList"></div>
-        </div>
-
-        <!-- DMs tab -->
-        <div class="tab-content" id="tab-dms">
-          <div class="search-bar">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search people…" autocomplete="off" />
-            <button class="clear-search hidden" id="clearSearch">✕</button>
-          </div>
-          <div class="section-label">ONLINE NOW</div>
-          <div class="user-list" id="userList"></div>
-          <div class="search-results hidden" id="searchResults">
-            <div class="section-label">RESULTS</div>
-            <div id="searchList"></div>
-          </div>
-        </div>
-      </aside>
-
-      <!-- Chat panel -->
-      <main class="chat-panel">
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon">💬</div>
-          <h2>Pick a conversation</h2>
-          <p>Join a room or message someone directly.</p>
-        </div>
-
-        <div class="chat-window hidden" id="chatWindow">
-          <div class="chat-header">
-            <div class="chat-peer-info">
-              <div class="peer-avatar" id="peerAvatar">😀</div>
-              <div>
-                <div class="peer-name" id="peerName">—</div>
-                <div class="peer-status" id="peerStatus">online</div>
-              </div>
-            </div>
+          <div style="display:flex;gap:4px;">
+            <button class="icon-btn" id="membersBtn" title="Members" style="display:none">👥</button>
             <button class="icon-btn close-chat" id="closeChatBtn">✕</button>
           </div>
-
-          <div class="messages-area" id="messagesArea">
-            <div class="messages-inner" id="messagesInner"></div>
-          </div>
-
-          <div class="typing-bar hidden" id="typingBar">
-            <span id="typingName">Someone</span> is typing
-            <span class="typing-dots"><span></span><span></span><span></span></span>
-          </div>
-
-          <div class="input-bar">
-            <button class="tool-btn emoji-toggle" id="emojiToggle" title="Emoji">😊</button>
-            <label class="tool-btn" title="Share image" for="imgUpload">🖼</label>
-            <input type="file" id="imgUpload" accept="image/*" class="hidden-file" />
-            <label class="tool-btn" title="Share video" for="vidUpload">🎥</label>
-            <input type="file" id="vidUpload" accept="video/*" class="hidden-file" />
-            <textarea id="messageInput" placeholder="Type a message…" rows="1"></textarea>
-            <button class="send-btn" id="sendBtn">➤</button>
-          </div>
-
-          <div class="emoji-picker hidden" id="emojiPicker"></div>
         </div>
-      </main>
+
+        <div class="messages-area" id="messagesArea">
+          <div class="messages-inner" id="messagesInner"></div>
+        </div>
+
+        <div class="typing-bar hidden" id="typingBar">
+          <span id="typingName">Someone</span> is typing
+          <span class="typing-dots"><span></span><span></span><span></span></span>
+        </div>
+
+        <div class="input-bar">
+          <button class="tool-btn" id="emojiToggle" title="Emoji">😊</button>
+          <label class="tool-btn" title="Image" for="imgUpload">🖼</label>
+          <input type="file" id="imgUpload" accept="image/*" style="display:none"/>
+          <label class="tool-btn" title="Video" for="vidUpload">🎥</label>
+          <input type="file" id="vidUpload" accept="video/*" style="display:none"/>
+          <textarea id="messageInput" placeholder="Type a message…" rows="1"></textarea>
+          <button class="send-btn" id="sendBtn">➤</button>
+        </div>
+        <div class="emoji-picker hidden" id="emojiPicker"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════════════ -->
+
+<!-- Create Room Modal -->
+<div class="modal-backdrop hidden" id="createRoomModal">
+  <div class="modal">
+    <h2>🏠 Create a Room</h2>
+    <div class="field">
+      <label>Room Name</label>
+      <input class="field-input" id="roomNameInput" placeholder="e.g. design-team, study-group" maxlength="50"/>
     </div>
-  </div>
-
-  <!-- Context menu for messages -->
-  <div class="ctx-menu hidden" id="ctxMenu">
-    <div class="ctx-item" id="ctx-react">React 😊</div>
-    <div class="ctx-item" id="ctx-delete">Delete 🗑</div>
-    <div class="ctx-item" id="ctx-copy">Copy 📋</div>
-  </div>
-
-  <!-- Emoji reaction picker (mini) -->
-  <div class="reaction-picker hidden" id="reactionPicker">
-    <span data-emoji="👍">👍</span>
-    <span data-emoji="❤️">❤️</span>
-    <span data-emoji="😂">😂</span>
-    <span data-emoji="😮">😮</span>
-    <span data-emoji="😢">😢</span>
-    <span data-emoji="🔥">🔥</span>
-    <span data-emoji="🎉">🎉</span>
-    <span data-emoji="👀">👀</span>
-  </div>
-
-  <!-- Create room modal -->
-  <div class="modal-overlay hidden" id="createRoomModal">
-    <div class="modal">
-      <h3>Create a Room</h3>
-      <input type="text" id="roomNameInput" placeholder="e.g. design-team" maxlength="40" />
-      <div class="modal-actions">
-        <button class="btn-secondary" id="cancelRoomBtn">Cancel</button>
-        <button class="btn-primary" id="confirmRoomBtn">Create</button>
+    <div class="field">
+      <label>Access Token <span style="color:var(--muted);font-weight:400">(share this to invite members)</span></label>
+      <div style="display:flex;gap:8px;align-items:stretch">
+        <input class="field-input" id="roomTokenInput" placeholder="Min. 4 characters" maxlength="40" style="font-family:var(--mono);letter-spacing:.1em;flex:1"/>
+        <button class="btn-ghost" onclick="generateToken()" style="flex-shrink:0;padding:0 14px">🎲 Generate</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Edit profile modal -->
-  <div class="modal-overlay hidden" id="editProfileModal">
-    <div class="modal">
-      <h3>Edit Profile</h3>
-      <label>Avatar</label>
-      <div class="avatar-picker" id="editAvatarPicker">
-        <span class="av-opt" data-emoji="😀">😀</span>
-        <span class="av-opt" data-emoji="😎">😎</span>
-        <span class="av-opt" data-emoji="🦊">🦊</span>
-        <span class="av-opt" data-emoji="🐼">🐼</span>
-        <span class="av-opt" data-emoji="🦁">🦁</span>
-        <span class="av-opt" data-emoji="🐸">🐸</span>
-        <span class="av-opt" data-emoji="🤖">🤖</span>
-        <span class="av-opt" data-emoji="👾">👾</span>
-        <span class="av-opt" data-emoji="🦋">🦋</span>
-        <span class="av-opt" data-emoji="🌙">🌙</span>
-        <span class="av-opt" data-emoji="⚡">⚡</span>
-        <span class="av-opt" data-emoji="🔥">🔥</span>
-        <span class="av-opt" data-emoji="🎭">🎭</span>
-        <span class="av-opt" data-emoji="🦄">🦄</span>
-        <span class="av-opt" data-emoji="🐉">🐉</span>
-        <span class="av-opt" data-emoji="🌺">🌺</span>
-      </div>
-      <label>Color</label>
-      <div class="color-picker" id="editColorPicker">
-        <span class="cl-opt" data-color="#6C63FF" style="background:#6C63FF;"></span>
-        <span class="cl-opt" data-color="#FF6584" style="background:#FF6584;"></span>
-        <span class="cl-opt" data-color="#43D9A2" style="background:#43D9A2;"></span>
-        <span class="cl-opt" data-color="#F9A826" style="background:#F9A826;"></span>
-        <span class="cl-opt" data-color="#00C9FF" style="background:#00C9FF;"></span>
-        <span class="cl-opt" data-color="#FF8C42" style="background:#FF8C42;"></span>
-        <span class="cl-opt" data-color="#C77DFF" style="background:#C77DFF;"></span>
-        <span class="cl-opt" data-color="#4CC9F0" style="background:#4CC9F0;"></span>
-        <span class="cl-opt" data-color="#F72585" style="background:#F72585;"></span>
-        <span class="cl-opt" data-color="#7BF1A8" style="background:#7BF1A8;"></span>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary" id="cancelProfileBtn">Cancel</button>
-        <button class="btn-primary" id="saveProfileBtn">Save</button>
+      <div id="tokenPreview" class="token-preview hidden">
+        🔑 Token: <strong id="tokenDisplay" style="font-family:var(--mono);color:var(--green)"></strong>
+        <button onclick="copyToken()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;margin-left:auto">📋 Copy</button>
       </div>
     </div>
+    <div id="createRoomErr" class="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelRoomBtn">Cancel</button>
+      <button class="btn-primary" id="confirmRoomBtn">Create Room ✨</button>
+    </div>
   </div>
+</div>
 
-  <!-- Media lightbox -->
-  <div class="lightbox hidden" id="lightbox">
-    <div class="lightbox-overlay" id="lightboxOverlay"></div>
-    <div class="lightbox-content" id="lightboxContent"></div>
-    <button class="lightbox-close" id="lightboxClose">✕</button>
+<!-- Join Room Modal -->
+<div class="modal-backdrop hidden" id="joinRoomModal">
+  <div class="modal">
+    <h2>🔑 Join a Room</h2>
+    <div class="field">
+      <label>Room ID or select from list</label>
+      <select class="field-input" id="joinRoomSelect">
+        <option value="">— Select a room —</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Access Token</label>
+      <input class="field-input" id="joinTokenInput" placeholder="Enter the room token" style="font-family:var(--mono);letter-spacing:.1em"/>
+    </div>
+    <div id="joinRoomErr" class="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelJoinBtn">Cancel</button>
+      <button class="btn-primary" id="confirmJoinBtn">Join Room →</button>
+    </div>
   </div>
+</div>
 
-  <!-- Toast container -->
-  <div class="toast-container" id="toastContainer"></div>
+<!-- Members Modal -->
+<div class="modal-backdrop hidden" id="membersModal">
+  <div class="modal">
+    <h2>👥 Room Members</h2>
+    <div id="membersList" class="members-list"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="closeMembersBtn">Close</button>
+    </div>
+  </div>
+</div>
 
-  <script src="app.js"></script>
+<!-- Edit Profile Modal -->
+<div class="modal-backdrop hidden" id="editProfileModal">
+  <div class="modal">
+    <h2>✏️ Edit Profile</h2>
+    <div class="av-preview" id="editAvPreview"></div>
+
+    <div class="av-section">
+      <div class="av-label">Gender</div>
+      <div class="av-pills">
+        <button class="av-pill" data-ekey="gender" data-val="boy">👦 Boy</button>
+        <button class="av-pill" data-ekey="gender" data-val="girl">👧 Girl</button>
+      </div>
+    </div>
+    <div class="av-section">
+      <div class="av-label">Skin</div>
+      <div class="av-swatches">
+        <button class="av-sw" data-ekey="skin" data-val="light"       style="background:#FFDBAC"></button>
+        <button class="av-sw" data-ekey="skin" data-val="medium_light"style="background:#F1C27D"></button>
+        <button class="av-sw" data-ekey="skin" data-val="medium"      style="background:#C68642"></button>
+        <button class="av-sw" data-ekey="skin" data-val="medium_dark" style="background:#8D5524"></button>
+        <button class="av-sw" data-ekey="skin" data-val="dark"        style="background:#4A2912"></button>
+      </div>
+    </div>
+    <div class="av-section">
+      <div class="av-label">Hair</div>
+      <div class="av-swatches">
+        <button class="av-sw" data-ekey="hair" data-val="black" style="background:#1a1a1a"></button>
+        <button class="av-sw" data-ekey="hair" data-val="brown" style="background:#6B3A2A"></button>
+        <button class="av-sw" data-ekey="hair" data-val="blonde"style="background:#D4A017"></button>
+        <button class="av-sw" data-ekey="hair" data-val="red"   style="background:#C0392B"></button>
+        <button class="av-sw" data-ekey="hair" data-val="gray"  style="background:#95a5a6"></button>
+        <button class="av-sw" data-ekey="hair" data-val="pink"  style="background:#FF69B4"></button>
+        <button class="av-sw" data-ekey="hair" data-val="blue"  style="background:#4169E1"></button>
+      </div>
+    </div>
+    <div class="av-section">
+      <div class="av-label">Outfit</div>
+      <div class="av-swatches">
+        <button class="av-sw" data-ekey="outfit" data-val="#667eea" style="background:#667eea"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#f472b6" style="background:#f472b6"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#22d3a5" style="background:#22d3a5"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#fbbf24" style="background:#fbbf24"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#f87171" style="background:#f87171"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#38bdf8" style="background:#38bdf8"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#a78bfa" style="background:#a78bfa"></button>
+        <button class="av-sw" data-ekey="outfit" data-val="#34d399" style="background:#34d399"></button>
+      </div>
+    </div>
+
+    <div id="editProfileErr" class="modal-err"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="cancelProfileBtn">Cancel</button>
+      <button class="btn-primary" id="saveProfileBtn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reaction picker -->
+<div class="reaction-picker hidden" id="reactionPicker">
+  <span data-emoji="👍">👍</span><span data-emoji="❤️">❤️</span>
+  <span data-emoji="😂">😂</span><span data-emoji="😮">😮</span>
+  <span data-emoji="😢">😢</span><span data-emoji="🔥">🔥</span>
+  <span data-emoji="🎉">🎉</span><span data-emoji="👀">👀</span>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox hidden" id="lightbox">
+  <div class="lightbox-overlay" id="lightboxOverlay"></div>
+  <div class="lightbox-content" id="lightboxContent"></div>
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="app.js"></script>
 </body>
 </html>
