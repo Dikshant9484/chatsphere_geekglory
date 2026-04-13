@@ -101,29 +101,20 @@ wss.on('connection', ws => {
 
       const key = username.toLowerCase();
 
-      // 🔁 Existing user reconnect
+      // 🔥 FIX: REMOVE OLD USER IF EXISTS (prevents ghost users)
       if (usersByName.has(key)) {
-        const uid = usersByName.get(key);
-        const user = users.get(uid);
+        const oldId = usersByName.get(key);
+        const oldUser = users.get(oldId);
 
-        user.ws = ws;
-        user.status = 'online';
-        user.lastSeen = Date.now();
-        me = user;
+        try {
+          oldUser?.ws?.terminate();
+        } catch {}
 
-        send(ws, {
-          type: 'registered',
-          user: pubUser(user),
-          users: allUsers(),
-          rooms: [],        // ✅ FIX
-          myRooms: []       // ✅ FIX
-        });
-
-        broadcastAll({ type:'user_status', userId:uid, status:'online' }, uid);
-        return;
+        users.delete(oldId);
+        usersByName.delete(key);
       }
 
-      // 🆕 New user
+      // 🆕 CREATE NEW USER
       const id = uuidv4();
 
       const user = {
@@ -140,12 +131,13 @@ wss.on('connection', ws => {
       usersByName.set(key, id);
       me = user;
 
+      // ✅ FIX: include rooms + myRooms
       send(ws, {
         type: 'registered',
         user: pubUser(user),
         users: allUsers(),
-        rooms: [],        // ✅ FIX
-        myRooms: []       // ✅ FIX
+        rooms: [],
+        myRooms: []
       });
 
       broadcastAll({ type:'user_joined', user: pubUser(user) }, id);
@@ -177,7 +169,7 @@ wss.on('connection', ws => {
     }
   });
 
-  /* ===== REMOVE USER ON DISCONNECT ===== */
+  /* ===== DISCONNECT CLEANUP ===== */
   ws.on('close', () => {
     if (!me) return;
 
