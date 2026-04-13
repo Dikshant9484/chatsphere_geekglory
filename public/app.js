@@ -185,17 +185,52 @@ document.querySelectorAll('[data-ekey]').forEach(btn => {
 
 /* ══════════════════════ WEBSOCKET ══════════════════════════════════════ */
 function connectWS() {
-  const proto = location.protocol==='https:' ? 'wss' : 'ws';
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   S.ws = new WebSocket(`${proto}://${location.host}`);
+
   S.ws.onopen = () => {
-    S.wsRetries=0;
-    if (S.me) wsSend({ type:'register', username:S.me.username, avatar:S.me.avatar, color:S.me.color });
+    S.wsRetries = 0;
+
+    // 🔥 FIX: send register ONLY if not already registered
+    if (S.me && !S.me.id) {
+      wsSend({
+        type: 'register',
+        username: S.me.username,
+        avatar: S.me.avatar,
+        color: S.me.color
+      });
+    }
   };
-  S.ws.onmessage = e => { try { handleMsg(JSON.parse(e.data)); } catch {} };
-  S.ws.onclose = () => { if (S.me && S.wsRetries<10) { S.wsRetries++; setTimeout(connectWS, Math.min(1000*S.wsRetries,8000)); } };
-  S.ws.onerror = ()=>{};
+
+  S.ws.onmessage = e => {
+    try {
+      handleMsg(JSON.parse(e.data));
+    } catch (err) {
+      console.error("Message parse error:", err);
+    }
+  };
+
+  S.ws.onclose = () => {
+    if (S.me && S.wsRetries < 10) {
+      S.wsRetries++;
+      setTimeout(connectWS, Math.min(1000 * S.wsRetries, 8000));
+    }
+  };
+
+  // 🔥 FIX: show error instead of silent failure
+  S.ws.onerror = (err) => {
+    console.error("WebSocket error:", err);
+    toast("Connection failed", "error");
+  };
 }
-function wsSend(data) { if (S.ws?.readyState===WebSocket.OPEN) S.ws.send(JSON.stringify(data)); }
+
+function wsSend(data) {
+  if (S.ws?.readyState === WebSocket.OPEN) {
+    S.ws.send(JSON.stringify(data));
+  } else {
+    console.warn("WebSocket not ready");
+  }
+}
 
 /* ══════════════════════ MESSAGE HANDLER ════════════════════════════════ */
 function handleMsg(msg) {
@@ -707,14 +742,27 @@ window.closeSidebar=closeSidebar;
 /* ══════════════════════ EVENT LISTENERS ════════════════════════════════ */
 
 // Login
-$('loginBtn').onclick=()=>{
-  const username=$('usernameInput').value.trim();
-  if(username.length<2){$('loginError').textContent='Name must be at least 2 chars.';return;}
-  $('loginError').textContent='';
-  S.avatarCfg.outfit=S.avatarCfg.outfit||'#667eea';
-  const avatarStr=encodeAvatar(S.avatarCfg);
+$('loginBtn').onclick = () => {
+  const username = $('usernameInput').value.trim();
+
+  if (username.length < 2) {
+    $('loginError').textContent = 'Name must be at least 2 chars.';
+    return;
+  }
+
+  $('loginError').textContent = '';
+
+  const avatarStr = encodeAvatar(S.avatarCfg);
+
+  // ✅ store user FIRST
+  S.me = {
+    username,
+    avatar: avatarStr,
+    color: S.avatarCfg.outfit || '#667eea'
+  };
+
+  // ✅ only connect
   connectWS();
-  S.ws.onopen=()=>{ wsSend({type:'register',username,avatar:avatarStr,color:S.avatarCfg.outfit}); };
 };
 $('usernameInput').onkeydown=e=>{ if(e.key==='Enter') $('loginBtn').click(); };
 

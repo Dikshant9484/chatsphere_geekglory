@@ -28,19 +28,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 const WS_RATE_LIMIT  = parseInt(process.env.RATE_LIMIT  || '60');
 const WS_RATE_WINDOW = parseInt(process.env.RATE_WINDOW || '10000');
 const MAX_MSG_LEN    = parseInt(process.env.MAX_MSG_LEN || '2000');
-const MAX_HISTORY    = parseInt(process.env.MAX_HISTORY || '200');
-const MAX_ROOMS      = parseInt(process.env.MAX_ROOMS   || '50');
 
 /* ================= STORAGE ================= */
 const users       = new Map();
 const usersByName = new Map();
-const dmHistory   = new Map();
-const rooms       = new Map();
 const rateLimits  = new Map();
 
 /* ================= HELPERS ================= */
 const san = s => xss(String(s||'').trim());
-const dmKey = (a,b) => [a,b].sort().join('::');
 
 const send = (ws, d) => {
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -55,13 +50,6 @@ function broadcastAll(data, excludeId=null) {
   users.forEach((u,id) => {
     if (id !== excludeId) send(u.ws, data);
   });
-}
-
-function push(arr, item) {
-  arr.push(item);
-  if (arr.length > MAX_HISTORY) {
-    arr.splice(0, arr.length - MAX_HISTORY);
-  }
 }
 
 function wsRateOk(userId) {
@@ -113,6 +101,7 @@ wss.on('connection', ws => {
 
       const key = username.toLowerCase();
 
+      // 🔁 Existing user reconnect
       if (usersByName.has(key)) {
         const uid = usersByName.get(key);
         const user = users.get(uid);
@@ -123,15 +112,18 @@ wss.on('connection', ws => {
         me = user;
 
         send(ws, {
-          type:'registered',
+          type: 'registered',
           user: pubUser(user),
-          users: allUsers()
+          users: allUsers(),
+          rooms: [],        // ✅ FIX
+          myRooms: []       // ✅ FIX
         });
 
         broadcastAll({ type:'user_status', userId:uid, status:'online' }, uid);
         return;
       }
 
+      // 🆕 New user
       const id = uuidv4();
 
       const user = {
@@ -149,9 +141,11 @@ wss.on('connection', ws => {
       me = user;
 
       send(ws, {
-        type:'registered',
+        type: 'registered',
         user: pubUser(user),
-        users: allUsers()
+        users: allUsers(),
+        rooms: [],        // ✅ FIX
+        myRooms: []       // ✅ FIX
       });
 
       broadcastAll({ type:'user_joined', user: pubUser(user) }, id);
@@ -183,18 +177,16 @@ wss.on('connection', ws => {
     }
   });
 
-  /* ================= 🔥 OFFLINE REMOVE ================= */
+  /* ===== REMOVE USER ON DISCONNECT ===== */
   ws.on('close', () => {
     if (!me) return;
 
     const userId = me.id;
     const username = me.username.toLowerCase();
 
-    // ✅ REMOVE USER COMPLETELY
     users.delete(userId);
     usersByName.delete(username);
 
-    // ✅ INFORM EVERYONE
     broadcastAll({
       type: 'user_left',
       userId: userId
